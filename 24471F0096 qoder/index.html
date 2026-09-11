@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cervical Cancer Prediction</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Cervical Cancer Prediction System</h1>
+        <p>This system uses machine learning to predict the risk of cervical cancer based on blood test results and patient information.</p>
+        
+        <form id="predictionForm">
+            <div class="form-group">
+                <label for="age">Age:</label>
+                <input type="number" id="age" name="age" min="1" max="120" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="sex">Sex:</label>
+                <select id="sex" name="sex" required>
+                    <option value="">Select</option>
+                    <option value="m">Male</option>
+                    <option value="f">Female</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="alb">Albumin (ALB) (g/L):</label>
+                <input type="number" id="alb" name="alb" step="0.1" min="0" max="100" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="alp">Alkaline Phosphatase (ALP) (U/L):</label>
+                <input type="number" id="alp" name="alp" step="0.1" min="0" max="500" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="alt">Alanine Aminotransferase (ALT) (U/L):</label>
+                <input type="number" id="alt" name="alt" step="0.1" min="0" max="500" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="ast">Aspartate Aminotransferase (AST) (U/L):</label>
+                <input type="number" id="ast" name="ast" step="0.1" min="0" max="500" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="bil">Bilirubin (BIL) (μmol/L):</label>
+                <input type="number" id="bil" name="bil" step="0.1" min="0" max="100" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="che">Cholinesterase (CHE) (kU/L):</label>
+                <input type="number" id="che" name="che" step="0.01" min="0" max="20" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="chol">Cholesterol (CHOL) (mmol/L):</label>
+                <input type="number" id="chol" name="chol" step="0.01" min="0" max="20" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="crea">Creatinine (CREA) (μmol/L):</label>
+                <input type="number" id="crea" name="crea" step="0.1" min="0" max="2000" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="ggt">Gamma-Glutamyl Transferase (GGT) (U/L):</label>
+                <input type="number" id="ggt" name="ggt" step="0.1" min="0" max="500" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="prot">Protein (PROT) (g/L):</label>
+                <input type="number" id="prot" name="prot" step="0.1" min="0" max="100" required>
+            </div>
+            
+            <div class="button-group">
+                <button type="submit">Predict Risk</button>
+                <button type="button" id="loadSampleBtn">Load Random Sample</button>
+            </div>
+        </form>
+        
+        <div id="result" class="result-container">
+            <h3>Prediction Result:</h3>
+            <div id="predictionOutput"></div>
+        </div>
+    </div>
+    
+    
+        <!-- Sample data for demonstration -->
+        <script>
+            // Sample data extracted from the Cervical_Cancer.csv dataset
+            const sampleData = [
+                {age: 32, sex: 'm', alb: 38.5, alp: 52.5, alt: 7.7, ast: 22.1, bil: 7.5, che: 6.93, chol: 3.23, crea: 106, ggt: 12.1, prot: 69},
+                {age: 47, sex: 'm', alb: 45, alp: 56.3, alt: null, ast: 33.1, bil: 7, che: 9.58, chol: 6, crea: 77.9, ggt: 18.9, prot: 63},
+                {age: 38, sex: 'm', alb: 45, alp: 56.3, alt: 19.1, ast: 164.2, bil: 17, che: 7.09, chol: 3.2, crea: 79.3, ggt: 90.4, prot: 70.1},
+                {age: 25, sex: 'm', alb: 42, alp: 38.2, alt: 63.3, ast: 187.7, bil: 14, che: 6, chol: 4.28, crea: 66.9, ggt: 40.2, prot: 70.5},
+                {age: 41, sex: 'm', alb: 42, alp: 39.6, alt: 26.5, ast: 77.6, bil: 42, che: 9.67, chol: 9.67, crea: 57.7, ggt: 143.4, prot: 75.8},
+                {age: 44, sex: 'm', alb: 49, alp: 27.3, alt: 40.2, ast: 31.1, bil: 13, che: 8.91, chol: 4.07, crea: 81.5, ggt: 27.6, prot: 72.8},
+                {age: 33, sex: 'f', alb: 43, alp: 29.6, alt: 3.8, ast: 16.7, bil: 6, che: 6.88, chol: 5.72, crea: 58.8, ggt: 11.5, prot: 78.2},
+                {age: 41, sex: 'f', alb: 37, alp: 31.2, alt: 8.2, ast: 38.3, bil: 7, che: 7.08, chol: 5.3, crea: 60.8, ggt: 24.7, prot: 82.4},
+                {age: 50, sex: 'f', alb: 40, alp: 32.7, alt: 9, ast: 46, bil: 10, che: 7.51, chol: 4.67, crea: 56.6, ggt: 22.3, prot: 70.1},
+                {age: 38, sex: 'm', alb: 44, alp: 45, alt: 21.6, ast: 22.3, bil: 7.7, che: 9.94, chol: 6.09, crea: 88, ggt: 23.3, prot: 73.9}
+            ];
+            
+            document.getElementById('loadSampleBtn').addEventListener('click', function() {
+                // Get a random sample from the dataset
+                const randomSample = sampleData[Math.floor(Math.random() * sampleData.length)];
+                
+                // Populate the form with sample data
+                document.getElementById('age').value = randomSample.age;
+                document.getElementById('sex').value = randomSample.sex;
+                document.getElementById('alb').value = randomSample.alb;
+                document.getElementById('alp').value = randomSample.alp;
+                document.getElementById('alt').value = randomSample.alt;
+                document.getElementById('ast').value = randomSample.ast;
+                document.getElementById('bil').value = randomSample.bil;
+                document.getElementById('che').value = randomSample.che;
+                document.getElementById('chol').value = randomSample.chol;
+                document.getElementById('crea').value = randomSample.crea;
+                document.getElementById('ggt').value = randomSample.ggt;
+                document.getElementById('prot').value = randomSample.prot;
+                
+                // Show notification
+                alert('Random sample loaded! Click "Predict Risk" to see the prediction.');
+            });
+        </script>
+        <script src="script.js"></script>
+</body>
+</html>
